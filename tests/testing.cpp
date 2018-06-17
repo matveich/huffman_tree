@@ -128,6 +128,7 @@ void cmp_files(const std::string& a_name, const std::string& b_name) {
     delete[] buffer_b;
 }
 
+
 void check_eq_file(const std::string& src_name) {
     std::string dst_name = src_name + "_";
     encoder* e = new encoder(src_name, "encoded");
@@ -144,6 +145,7 @@ void check_eq_file(const std::string& src_name) {
     std::remove(dst_name.c_str());
 }
 
+/*
 TEST(file_correctness, empty) {
     check_eq_file("../tests/files/empty");
 }
@@ -167,3 +169,4 @@ TEST(file_correctness, small_video_file) {
 TEST(file_correctness, big_video_file) {
     check_eq_file("../tests/files/linch_geniy.mp4");
 }
+*/
