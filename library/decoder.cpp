@@ -13,7 +13,7 @@ void decoder::decode() {
 
 void decoder::decompress() {
     char *buffer = new char[buffer_size];
-    bit_sequence bs(1);
+    bit_sequence bs(9);
     while (src_file) {
         src_file.read(buffer, buffer_size);
         bit_sequence *decompressed = h_tree->decompress(buffer, static_cast<size_t>(src_file.gcount()), bs, !src_file);

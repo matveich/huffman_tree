@@ -156,7 +156,7 @@ bit_sequence *tree::compress(const char *data, size_t data_size, bit_sequence &o
 
 bit_sequence *tree::decompress(const char *data, size_t data_size, bit_sequence &offset, bool is_last_chunk) {
     size_t bit_size = data_size * 8, result_pos = 0;
-    bit_sequence *result = new bit_sequence(bit_size * 8 + 2);
+    bit_sequence *result = new bit_sequence(bit_size * 8 + 10);
     if (!head)
         return result;
     if (is_last_chunk)
