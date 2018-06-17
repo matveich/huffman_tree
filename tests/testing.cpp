@@ -4,6 +4,9 @@
 
 
 #include <cmath>
+#include <fstream>
+#include <library/encoder.h>
+#include <library/decoder.h>
 #include "gtest/gtest.h"
 #include "tree.h"
 
@@ -103,3 +106,65 @@ TEST(correctness, critical_size_random) {
     }
     check_eq(s);
 }
+/*
+void cmp_files(const std::string& a_name, const std::string& b_name) {
+    std::ifstream a(a_name), b(b_name);
+    EXPECT_TRUE(a.is_open());
+    EXPECT_TRUE(b.is_open());
+
+    size_t buffer_size = 1024 * 128;
+    char* buffer_a = new char[buffer_size];
+    char* buffer_b = new char[buffer_size];
+    while (a) {
+        a.read(buffer_a, buffer_size);
+        b.read(buffer_b, buffer_size);
+        EXPECT_EQ(a.eof(), b.eof());
+        EXPECT_EQ(a.gcount(), b.gcount());
+        size_t size = static_cast<size_t>(a.gcount());
+        for (size_t i = 0; i < size; ++i)
+            EXPECT_EQ(buffer_a[i], buffer_b[i]);
+    }
+    delete[] buffer_a;
+    delete[] buffer_b;
+}
+
+void check_eq_file(const std::string& src_name) {
+    std::string dst_name = src_name + "_";
+    encoder* e = new encoder(src_name, "encoded");
+    e->encode();
+    delete e;
+
+    decoder* d = new decoder("encoded", dst_name);
+    d->decode();
+    delete d;
+
+    std::remove("encoded");
+
+    cmp_files(src_name, dst_name);
+    std::remove(dst_name.c_str());
+}
+
+TEST(file_correctness, empty) {
+    check_eq_file("../tests/files/empty");
+}
+
+TEST(file_correctness, simple_text_file) {
+    check_eq_file("../tests/files/test1.txt");
+}
+
+TEST(file_correctness, text_file) {
+    check_eq_file("../tests/files/prestuplenie_i_nakazanie.pdf");
+}
+
+TEST(file_correctness, big_text_file) {
+    check_eq_file("../tests/files/shildt.pdf");
+}
+
+TEST(file_correctness, small_video_file) {
+    check_eq_file("../tests/files/02.avi");
+}
+
+TEST(file_correctness, big_video_file) {
+    check_eq_file("../tests/files/linch_geniy.mp4");
+}
+*/

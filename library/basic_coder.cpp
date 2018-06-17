@@ -4,7 +4,7 @@
 
 #include "basic_coder.h"
 
-basic_coder::basic_coder(std::string &src, std::string &dst, size_t buf_sz) :
+basic_coder::basic_coder(const std::string &src, const std::string &dst, size_t buf_sz) :
         src_file(src, std::ios::in | std::ios::binary),
         dst_file(dst, std::ios::out | std::ios::binary),
         buffer_size(buf_sz) {

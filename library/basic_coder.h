@@ -19,7 +19,7 @@ protected:
 
     tree *h_tree;
 
-    basic_coder(std::string &src, std::string &dst, size_t buf_sz);
+    basic_coder(const std::string &src, const std::string &dst, size_t buf_sz);
 
     ~basic_coder();
 };

@@ -10,7 +10,7 @@
 
 class decoder : basic_coder {
 public:
-    decoder(std::string &src, std::string &dst);
+    decoder(const std::string &src, const std::string &dst);
 
     void decode();
 

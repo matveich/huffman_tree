@@ -7,3 +7,6 @@ compressed file specification:
 expected_offset
 
 * - normalized [-128, 128)
+
+-e ../tests/files/02.avi encoded
+-d encoded ../tests/files/021.avi

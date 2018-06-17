@@ -39,7 +39,7 @@ int main(int argc, char *argv[]) {
         }
         catch (std::exception &ex) {
             print_error(ex.what());
-            return 0;
+            return 1;
         }
     } else if (option == "-d" || option == "--decode") {
         try {
@@ -49,7 +49,7 @@ int main(int argc, char *argv[]) {
         }
         catch (std::exception &ex) {
             print_error(ex.what());
-            return 0;
+            return 1;
         }
     } else {
         print_error("Unknown option: " + std::string(option));

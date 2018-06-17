@@ -10,7 +10,7 @@
 
 class encoder : basic_coder {
 public:
-    encoder(std::string &src, std::string &dst);
+    encoder(const std::string &src, const std::string &dst);
 
     void encode();
 

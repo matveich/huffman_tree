@@ -1,11 +1,10 @@
-//
 // Created by matveich on 08.06.18.
 //
 
 #include "encoder.h"
 
 
-encoder::encoder(std::string &src, std::string &dst) : basic_coder(src, dst, 8 * 1024 * 1024) {}
+encoder::encoder(const std::string &src, const std::string &dst) : basic_coder(src, dst, 8 * 1024 * 1024) {}
 
 void encoder::count_bytes() {
     auto buffer = new char[buffer_size];

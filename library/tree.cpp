@@ -88,6 +88,7 @@ char tree::calc_data_size() {
     ull data_size = 0;
     for (size_t i = 0; i < SIGMA_SIZE; ++i)
         data_size += freq_dict[i] * dict[i].bit_size();
+    //std::cout << data_size << std::endl;
     return expected_offset = static_cast<char>((8 - data_size % 8) % 8);
 }
 
@@ -137,7 +138,7 @@ bit_sequence tree::uint8_to_bitseq(uint8_t c, size_t length) {
 }
 
 bit_sequence *tree::compress(const char *data, size_t data_size, bit_sequence &offset) {
-    bit_sequence *compressed_data = new bit_sequence(data_size * max_tree_depth / 8 + 1);
+    bit_sequence *compressed_data = new bit_sequence(data_size * max_tree_depth / 8 + 2);
     compressed_data->append(offset);
     offset.clear();
     //offset.~bit_sequence();

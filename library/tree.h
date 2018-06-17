@@ -73,11 +73,14 @@ private:
                 key(key) {}
 
         ~vertex() {
-            if (left)
+            if (left) {
                 delete left;
-            if (right)
+                left = nullptr;
+            }
+            if (right) {
                 delete right;
-            left = right = nullptr;
+                right = nullptr;
+            }
         }
     } *head;
 

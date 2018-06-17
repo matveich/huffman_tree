@@ -80,7 +80,7 @@ void bit_sequence::append(bit_sequence &bs) {
     size_t j = i;
     data[_bit_size >> 3] += (bs.data[i >> 3] << mod8);
     i += 8 - mod8;
-    if (i < _bit_size)
+    if (i < bs._bit_size)
         data[_bit_size >> 3] += (bs.data[i >> 3] >> (8 - mod8));
     _bit_size += bs._bit_size - j;
 }
@@ -104,6 +104,8 @@ void bit_sequence::set_byte(size_t pos, uint8_t val) {
 }
 
 void bit_sequence::clear() {
+    for (size_t i = 0; i < _capacity; i++)
+        data[i] = 0;
     _bit_size = 0;
 }
 
