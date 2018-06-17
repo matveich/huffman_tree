@@ -16,7 +16,7 @@ void check_eq(const std::string& data) {
     t.update_dict(data.data(), data.size());
     t.build();
     bit_sequence offset(1), offset1(1);
-    bit_sequence* compressed = t.compress(data.data(), data.size(), offset);
+    auto compressed = t.compress(data.data(), data.size(), offset);
     if (offset.size() > 0)
         compressed->append(offset);
     EXPECT_TRUE(compressed->size() <= data.size());
@@ -24,10 +24,8 @@ void check_eq(const std::string& data) {
     tree t1;
     std::vector<char> dict = t.get_dict();
     t1.build_by_freq_dict(dict.data() + 1, dict.size() - 1);
-    bit_sequence* decompressed = t1.decompress((char*)compressed->get_data(), compressed->size(), offset1, true);
+    auto decompressed = t1.decompress((char*)compressed->get_data(), compressed->size(), offset1, true);
     EXPECT_EQ(data, std::string((char*)(decompressed->get_data()), decompressed->size()));
-    delete compressed;
-    delete decompressed;
 }
 
 
@@ -131,13 +129,14 @@ void cmp_files(const std::string& a_name, const std::string& b_name) {
 
 void check_eq_file(const std::string& src_name) {
     std::string dst_name = src_name + "_";
-    encoder* e = new encoder(src_name, "encoded");
-    e->encode();
-    delete e;
-
-    decoder* d = new decoder("encoded", dst_name);
-    d->decode();
-    delete d;
+    {
+        encoder e(src_name, "encoded");
+        e.encode();
+    }
+    {
+        decoder d("encoded", dst_name);
+        d.decode();
+    }
 
     std::remove("encoded");
 

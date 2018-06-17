@@ -29,8 +29,10 @@ bool bit_sequence::operator[](size_t bit_pos) const {
 }
 
 bit_sequence &bit_sequence::operator=(bit_sequence const &bs) {
-    delete[] data;
-    data = new uint8_t[bs._capacity];
+    if (bs._capacity != _capacity) {
+        delete[] data;
+        data = new uint8_t[bs._capacity];
+    }
     _capacity = bs._capacity;
     _bit_size = bs._bit_size;
     for (size_t i = 0; i < _capacity; i++)

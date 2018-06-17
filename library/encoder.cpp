@@ -20,9 +20,8 @@ void encoder::compress() {
     auto buffer = new char[buffer_size];
     while (src_file) {
         src_file.read(buffer, buffer_size);
-        bit_sequence *compressed = h_tree->compress(buffer, static_cast<size_t>(src_file.gcount()), bs);
+        auto compressed = h_tree->compress(buffer, static_cast<size_t>(src_file.gcount()), bs);
         dst_file.write((char *) compressed->get_data(), compressed->size());
-        delete compressed;
     }
     delete[] buffer;
     if (bs.bit_size() > 0)

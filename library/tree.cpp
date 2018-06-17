@@ -8,7 +8,6 @@ tree::tree() {
     freq_dict.resize(SIGMA_SIZE);
     dict.resize(SIGMA_SIZE);
     bs_repr.resize(SIGMA_SIZE);
-    head = nullptr;
     expected_offset = 0;
     max_tree_depth = 0;
 
@@ -25,34 +24,32 @@ void tree::update_dict(const char *data, size_t data_size) {
         ++freq_dict[char_to_u(data[i])];
 }
 
-tree::~tree() {
-    delete head;
-}
+tree::~tree() = default;
 
 void tree::build_tree() {
-    auto comp = [](vertex *a, vertex *b) { return a->value > b->value; };
-    std::priority_queue<vertex *, std::vector<vertex *>, decltype(comp)> q(comp);
+    auto comp = [](std::shared_ptr<vertex>& a, std::shared_ptr<vertex>& b) { return a->value > b->value; };
+    std::priority_queue<std::shared_ptr<vertex>, std::vector<std::shared_ptr<vertex> >, decltype(comp)> q(comp);
     for (size_t i = 0; i < freq_dict.size(); i++) {
         if (freq_dict[i] > 0)
-            q.push(new vertex(freq_dict[i], static_cast<int>(i)));
+            q.push(std::make_shared<vertex>(freq_dict[i], static_cast<int>(i)));
     }
     if (q.size() == 0)
         return;
     else if (q.size() == 1) {
-        q.push(new vertex(0, q.top()->key));
+        q.push(std::make_shared<vertex>(0, q.top()->key));
     }
     while (q.size() > 1) {
         auto l = q.top();
         q.pop();
         auto r = q.top();
         q.pop();
-        q.push(new vertex(l, r, l->value + r->value));
+        q.push(std::make_shared<vertex>(l, r, l->value + r->value));
     }
     head = q.top();
     q.pop();
 }
 
-void tree::build_dict(vertex *v, bit_sequence &seq, size_t depth) {
+void tree::build_dict(std::shared_ptr<vertex>& v, bit_sequence &seq, size_t depth) {
     if (v->key != -1) {
         dict[v->key] = seq;
         if (depth > max_tree_depth) {
@@ -137,15 +134,13 @@ bit_sequence tree::uint8_to_bitseq(uint8_t c, size_t length) {
     return bs;
 }
 
-bit_sequence *tree::compress(const char *data, size_t data_size, bit_sequence &offset) {
-    bit_sequence *compressed_data = new bit_sequence(data_size * max_tree_depth / 8 + 2);
+std::unique_ptr<bit_sequence> tree::compress(const char *data, size_t data_size, bit_sequence &offset) {
+    std::unique_ptr<bit_sequence> compressed_data =
+            std::make_unique<bit_sequence>(data_size * max_tree_depth / 8 + 2);
     compressed_data->append(offset);
     offset.clear();
-    //offset.~bit_sequence();
-    for (size_t i = 0; i < data_size; i++) {
+    for (size_t i = 0; i < data_size; i++)
         compressed_data->append(dict[char_to_u(data[i])]);
-    }
-    //std::cout << compressed_data.to_string() << std::endl;
     if (compressed_data->size() > 0)
         offset = uint8_to_bitseq(compressed_data->get_word(compressed_data->size() - 1),
                                  compressed_data->bit_size() % 8);
@@ -154,14 +149,15 @@ bit_sequence *tree::compress(const char *data, size_t data_size, bit_sequence &o
     return compressed_data;
 }
 
-bit_sequence *tree::decompress(const char *data, size_t data_size, bit_sequence &offset, bool is_last_chunk) {
+std::unique_ptr<bit_sequence> tree::decompress(const char *data, size_t data_size,
+                                               bit_sequence &offset, bool is_last_chunk) {
     size_t bit_size = data_size * 8, result_pos = 0;
-    bit_sequence *result = new bit_sequence(bit_size * 8 + 10);
+    std::unique_ptr<bit_sequence> result =  std::make_unique<bit_sequence>(bit_size * 8 + 10);
     if (!head)
         return result;
     if (is_last_chunk)
         bit_size -= expected_offset;
-    vertex *p = head;
+    auto p = head;
     for (size_t i = 0; i < offset.bit_size(); i++)
         p = (offset[i] ? p->right : p->left);
     offset.clear();

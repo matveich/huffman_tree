@@ -33,9 +33,8 @@ int main(int argc, char *argv[]) {
     std::string dst_name = argv[3];
     if (option == "-e" || option == "--encode") {
         try {
-            encoder *e = new encoder(src_name, dst_name);
-            e->encode();
-            delete e;
+            encoder e(src_name, dst_name);
+            e.encode();
         }
         catch (std::exception &ex) {
             print_error(ex.what());
@@ -43,9 +42,8 @@ int main(int argc, char *argv[]) {
         }
     } else if (option == "-d" || option == "--decode") {
         try {
-            decoder *d = new decoder(src_name, dst_name);
-            d->decode();
-            delete d;
+            decoder d(src_name, dst_name);
+            d.decode();
         }
         catch (std::exception &ex) {
             print_error(ex.what());

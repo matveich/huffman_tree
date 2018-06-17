@@ -15,6 +15,5 @@ basic_coder::basic_coder(const std::string &src, const std::string &dst, size_t 
     h_tree = new tree();
 }
 
-basic_coder::~basic_coder() {
-    delete h_tree;
-}
+
+basic_coder::~basic_coder() = default;

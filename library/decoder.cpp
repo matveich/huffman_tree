@@ -16,13 +16,11 @@ void decoder::decompress() {
     bit_sequence bs(9);
     while (src_file) {
         src_file.read(buffer, buffer_size);
-        bit_sequence *decompressed = h_tree->decompress(buffer, static_cast<size_t>(src_file.gcount()), bs, !src_file);
+        auto decompressed = h_tree->decompress(buffer, static_cast<size_t>(src_file.gcount()), bs, !src_file);
         dst_file.write((char *) decompressed->get_data(), decompressed->size());
-        delete decompressed;
     }
     if (bs.bit_size() > 0) {
         delete[] buffer;
-        delete this;
         throw std::runtime_error("decoded file is invalid");
     }
     delete[] buffer;
@@ -42,7 +40,6 @@ void decoder::read_dictionary() {
     if (dict_size > 1 && !src_file) {
         delete[] tmp;
         delete[] buffer;
-        delete this;
         throw std::runtime_error("decoded file is invalid");
     }
     h_tree->build_by_freq_dict(buffer, dict_size);

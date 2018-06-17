@@ -11,6 +11,8 @@
 #include <cassert>
 #include <cstring>
 #include <algorithm>
+#include <utility>
+#include <memory>
 #include "bit_sequence.h"
 
 class tree {
@@ -27,9 +29,9 @@ public:
 
     std::vector<char> get_dict();
 
-    bit_sequence *compress(const char *data, size_t data_size, bit_sequence &offset);
+    std::unique_ptr<bit_sequence> compress(const char *data, size_t data_size, bit_sequence &offset);
 
-    bit_sequence *decompress(const char *data, size_t data_size, bit_sequence &offset, bool is_last_chunk);
+    std::unique_ptr<bit_sequence> decompress(const char *data, size_t data_size, bit_sequence &offset, bool is_last_chunk);
 
     ~tree();
 
@@ -55,40 +57,29 @@ private:
     char expected_offset;
 
     struct vertex {
-        vertex *left;
-        vertex *right;
+        std::shared_ptr<vertex> left;
+        std::shared_ptr<vertex> right;
         ull value;
         int key;
 
-        vertex(vertex *l, vertex *r, ull val, int key = -1) :
+        vertex(std::shared_ptr<vertex>& l, std::shared_ptr<vertex>& r, ull val, int key = -1) :
                 left(l),
                 right(r),
                 value(val),
                 key(key) {}
 
         vertex(ull val, int key = -1) :
-                left(nullptr),
-                right(nullptr),
                 value(val),
                 key(key) {}
+    };
 
-        ~vertex() {
-            if (left) {
-                delete left;
-                left = nullptr;
-            }
-            if (right) {
-                delete right;
-                right = nullptr;
-            }
-        }
-    } *head;
+    std::shared_ptr<vertex> head;
 
     size_t max_tree_depth;
 
     void build_tree();
 
-    void build_dict(vertex *v, bit_sequence &seq, size_t depth);
+    void build_dict(std::shared_ptr<vertex>& v, bit_sequence &seq, size_t depth);
 
     char calc_data_size();
 
