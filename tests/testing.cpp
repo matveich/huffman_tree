@@ -106,7 +106,7 @@ TEST(correctness, critical_size_random) {
     }
     check_eq(s);
 }
-/*
+
 void cmp_files(const std::string& a_name, const std::string& b_name) {
     std::ifstream a(a_name), b(b_name);
     EXPECT_TRUE(a.is_open());
@@ -167,4 +167,3 @@ TEST(file_correctness, small_video_file) {
 TEST(file_correctness, big_video_file) {
     check_eq_file("../tests/files/linch_geniy.mp4");
 }
-*/
