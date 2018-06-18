@@ -7,6 +7,8 @@
 
 #include <iostream>
 #include <fstream>
+#include <utility>
+#include <memory>
 #include "tree.h"
 
 class basic_coder {
@@ -17,7 +19,7 @@ protected:
 
     size_t buffer_size;
 
-    tree *h_tree;
+    std::unique_ptr<tree> h_tree;
 
     basic_coder(const std::string &src, const std::string &dst, size_t buf_sz);
 

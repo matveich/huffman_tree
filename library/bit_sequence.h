@@ -7,6 +7,9 @@
 
 #include <iostream>
 #include <cassert>
+#include <utility>
+#include <memory>
+#include <vector>
 
 class bit_sequence {
 public:
@@ -14,7 +17,7 @@ public:
 
     bit_sequence(size_t capacity);
 
-    bool operator[](size_t bit_pos) const;
+    bool get_bit(size_t bit_pos) const;
 
     bit_sequence &operator=(bit_sequence const &);
 
@@ -39,7 +42,7 @@ public:
     void clear();
 
     template<typename T>
-    static bool get_bit(T &c, size_t pos) {
+    static bool get_bit(T& c, size_t pos) {
         return ((c >> (7 - pos)) & 1) == 1;
     }
 
@@ -51,7 +54,7 @@ public:
             c &= ~(1 << (7 - pos));
     }
 
-    uint8_t *get_data();
+    uint8_t* get_data();
 
     std::string to_string();
 
@@ -59,7 +62,7 @@ public:
 
 private:
     size_t _bit_size, _capacity;
-    uint8_t *data;
+    std::vector<uint8_t> data;
 };
 
 

@@ -7,23 +7,21 @@
 encoder::encoder(const std::string &src, const std::string &dst) : basic_coder(src, dst, 8 * 1024 * 1024) {}
 
 void encoder::count_bytes() {
-    auto buffer = new char[buffer_size];
+    std::vector<char> buffer(buffer_size);
     while (src_file) {
-        src_file.read(buffer, buffer_size);
-        h_tree->update_dict(buffer, static_cast<size_t>(src_file.gcount()));
+        src_file.read(buffer.data(), buffer_size);
+        h_tree->update_dict(buffer.data(), static_cast<size_t>(src_file.gcount()));
     }
-    delete[] buffer;
 }
 
 void encoder::compress() {
     bit_sequence bs(1);
-    auto buffer = new char[buffer_size];
+    std::vector<char> buffer(buffer_size);
     while (src_file) {
-        src_file.read(buffer, buffer_size);
-        auto compressed = h_tree->compress(buffer, static_cast<size_t>(src_file.gcount()), bs);
+        src_file.read(buffer.data(), buffer_size);
+        auto compressed = h_tree->compress(buffer.data(), static_cast<size_t>(src_file.gcount()), bs);
         dst_file.write((char *) compressed->get_data(), compressed->size());
     }
-    delete[] buffer;
     if (bs.bit_size() > 0)
         dst_file.write((char *) bs.get_data(), 1);
 }

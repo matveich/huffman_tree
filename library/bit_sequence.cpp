@@ -7,36 +7,27 @@
 bit_sequence::bit_sequence() {
     _bit_size = 0;
     _capacity = 0;
-    data = new uint8_t[1];
-    data[0] = 0;
+    data.resize(1);
 }
 
 bit_sequence::bit_sequence(size_t capacity) {
     _bit_size = 0;
     _capacity = capacity;
-    data = new uint8_t[_capacity];
-    std::fill(data, data + _capacity, 0);
+    data.resize(_capacity);
 }
 
-bit_sequence::~bit_sequence() {
-    delete[] data;
-}
+bit_sequence::~bit_sequence() = default;
 
-bool bit_sequence::operator[](size_t bit_pos) const {
+bool bit_sequence::get_bit(size_t bit_pos) const {
     size_t _pos = bit_pos & 0b111;
     bit_pos >>= 3;
     return get_bit(data[bit_pos], _pos);
 }
 
 bit_sequence &bit_sequence::operator=(bit_sequence const &bs) {
-    if (bs._capacity != _capacity) {
-        delete[] data;
-        data = new uint8_t[bs._capacity];
-    }
+    data = bs.data;
     _capacity = bs._capacity;
     _bit_size = bs._bit_size;
-    for (size_t i = 0; i < _capacity; i++)
-        data[i] = bs.data[i];
     return *this;
 }
 
@@ -91,8 +82,8 @@ uint8_t bit_sequence::get_word(size_t pos) {
     return data[pos];
 }
 
-uint8_t *bit_sequence::get_data() {
-    return data;
+uint8_t* bit_sequence::get_data() {
+    return data.data();
 }
 
 uint8_t bit_sequence::get_word(size_t pos, size_t offset) {

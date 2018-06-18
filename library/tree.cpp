@@ -27,7 +27,7 @@ void tree::update_dict(const char *data, size_t data_size) {
 tree::~tree() = default;
 
 void tree::build_tree() {
-    auto comp = [](std::shared_ptr<vertex>& a, std::shared_ptr<vertex>& b) { return a->value > b->value; };
+    auto comp = [](std::shared_ptr<vertex> &a, std::shared_ptr<vertex> &b) { return a->value > b->value; };
     std::priority_queue<std::shared_ptr<vertex>, std::vector<std::shared_ptr<vertex> >, decltype(comp)> q(comp);
     for (size_t i = 0; i < freq_dict.size(); i++) {
         if (freq_dict[i] > 0)
@@ -49,7 +49,7 @@ void tree::build_tree() {
     q.pop();
 }
 
-void tree::build_dict(std::shared_ptr<vertex>& v, bit_sequence &seq, size_t depth) {
+void tree::build_dict(std::shared_ptr<vertex> &v, bit_sequence &seq, size_t depth) {
     if (v->key != -1) {
         dict[v->key] = seq;
         if (depth > max_tree_depth) {
@@ -74,8 +74,8 @@ void tree::build() {
     build_dict(head, tmp, 0);
 }
 
-char *tree::ull_to_char(tree::ull x) {
-    char *result = new char[8];
+std::vector<char> tree::ull_to_char(tree::ull x) {
+    std::vector<char> result(8);
     for (size_t i = 0; i < 8; ++i)
         result[i] = u_to_char((x >> ((7 - i) * 8)) & 0xFF);
     return result;
@@ -90,9 +90,8 @@ char tree::calc_data_size() {
 }
 
 void tree::insert_ull(std::vector<char> &v, tree::ull x) {
-    char *char_val = ull_to_char(x);
-    v.insert(v.end(), char_val, char_val + 8);
-    delete[] char_val;
+    auto char_val = ull_to_char(x);
+    v.insert(v.end(), char_val.begin(), char_val.end());
 }
 
 std::vector<char> tree::get_dict() {
@@ -127,23 +126,17 @@ void tree::build_by_freq_dict(const char *data, size_t data_size) {
     build();
 }
 
-bit_sequence tree::uint8_to_bitseq(uint8_t c, size_t length) {
-    bit_sequence bs(1);
-    for (size_t i = 0; i < length; ++i)
-        bs.push(bit_sequence::get_bit<uint8_t>(c, i));
-    return bs;
-}
-
 std::unique_ptr<bit_sequence> tree::compress(const char *data, size_t data_size, bit_sequence &offset) {
-    std::unique_ptr<bit_sequence> compressed_data =
-            std::make_unique<bit_sequence>(data_size * max_tree_depth / 8 + 2);
+    auto compressed_data = std::make_unique<bit_sequence>(data_size * max_tree_depth / 8 + 2);
     compressed_data->append(offset);
     offset.clear();
     for (size_t i = 0; i < data_size; i++)
         compressed_data->append(dict[char_to_u(data[i])]);
-    if (compressed_data->size() > 0)
-        offset = uint8_to_bitseq(compressed_data->get_word(compressed_data->size() - 1),
-                                 compressed_data->bit_size() % 8);
+    for (size_t i = 0; i < compressed_data->bit_size() % 8; ++i) {
+        auto c = compressed_data->get_word(compressed_data->size() - 1);
+        offset.push(bit_sequence::get_bit<uint8_t>(c, i));
+    }
+
     while (compressed_data->bit_size() % 8 != 0)
         compressed_data->pop_bit();
     return compressed_data;
@@ -152,14 +145,14 @@ std::unique_ptr<bit_sequence> tree::compress(const char *data, size_t data_size,
 std::unique_ptr<bit_sequence> tree::decompress(const char *data, size_t data_size,
                                                bit_sequence &offset, bool is_last_chunk) {
     size_t bit_size = data_size * 8, result_pos = 0;
-    std::unique_ptr<bit_sequence> result =  std::make_unique<bit_sequence>(bit_size * 8 + 10);
+    auto result = std::make_unique<bit_sequence>(bit_size * 8 + 10);
     if (!head)
         return result;
     if (is_last_chunk)
         bit_size -= expected_offset;
     auto p = head;
     for (size_t i = 0; i < offset.bit_size(); i++)
-        p = (offset[i] ? p->right : p->left);
+        p = (offset.get_bit(i) ? p->right : p->left);
     offset.clear();
     for (size_t i = 0; i < bit_size; ++i) {
         if (p->key != -1) {
@@ -173,15 +166,14 @@ std::unique_ptr<bit_sequence> tree::decompress(const char *data, size_t data_siz
     }
     if (p->key != -1) {
         result->set_byte(result_pos, bs_repr[p->key].get_data()[0] ^ (uint8_t) 128u);
-    }
-    else {
+    } else {
         size_t c = 0;
         while (p->left) {
             c++;
             p = p->left;
         }
         for (size_t i = 0; i < dict[p->key].bit_size() - c; i++) {
-            offset.push(dict[p->key][i]);
+            offset.push(dict[p->key].get_bit(i));
         }
     }
     return result;

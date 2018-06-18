@@ -12,7 +12,7 @@ basic_coder::basic_coder(const std::string &src, const std::string &dst, size_t 
         throw std::runtime_error("Source file doesn't exist");
     if (!dst_file.is_open())
         throw std::runtime_error("Destination file name is invalid");
-    h_tree = new tree();
+    h_tree = std::unique_ptr<tree>(new tree());
 }
 
 

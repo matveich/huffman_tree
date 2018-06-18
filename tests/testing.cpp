@@ -38,7 +38,6 @@ TEST(correctness, empty) {
     check_eq("");
 }
 
-
 TEST(correctness, one) {
     check_eq("1");
 }
@@ -111,21 +110,18 @@ void cmp_files(const std::string& a_name, const std::string& b_name) {
     EXPECT_TRUE(b.is_open());
 
     size_t buffer_size = 1024 * 128;
-    char* buffer_a = new char[buffer_size];
-    char* buffer_b = new char[buffer_size];
+    auto buffer_a = std::unique_ptr<char[]>(new char[buffer_size]);
+    auto buffer_b = std::unique_ptr<char[]>(new char[buffer_size]);
     while (a) {
-        a.read(buffer_a, buffer_size);
-        b.read(buffer_b, buffer_size);
+        a.read(buffer_a.get(), buffer_size);
+        b.read(buffer_b.get(), buffer_size);
         EXPECT_EQ(a.eof(), b.eof());
         EXPECT_EQ(a.gcount(), b.gcount());
         size_t size = static_cast<size_t>(a.gcount());
         for (size_t i = 0; i < size; ++i)
             EXPECT_EQ(buffer_a[i], buffer_b[i]);
     }
-    delete[] buffer_a;
-    delete[] buffer_b;
 }
-
 
 void check_eq_file(const std::string& src_name) {
     std::string dst_name = src_name + "_";

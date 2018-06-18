@@ -12,37 +12,29 @@ void decoder::decode() {
 }
 
 void decoder::decompress() {
-    char *buffer = new char[buffer_size];
+    std::vector<char> buffer(buffer_size);
     bit_sequence bs(9);
     while (src_file) {
-        src_file.read(buffer, buffer_size);
-        auto decompressed = h_tree->decompress(buffer, static_cast<size_t>(src_file.gcount()), bs, !src_file);
+        src_file.read(buffer.data(), buffer_size);
+        auto decompressed = h_tree->decompress(buffer.data(), static_cast<size_t>(src_file.gcount()), bs, !src_file);
         dst_file.write((char *) decompressed->get_data(), decompressed->size());
     }
-    if (bs.bit_size() > 0) {
-        delete[] buffer;
+    if (bs.bit_size() > 0)
         throw std::runtime_error("decoded file is invalid");
-    }
-    delete[] buffer;
 }
 
 void decoder::read_dictionary() {
-    char *tmp = new char[1];
-    src_file.read(tmp, 1);
+    std::vector<char> tmp(1);
+    src_file.read(tmp.data(), 1);
     size_t MAX_DICT_SIZE = 256 * 9;
     size_t dict_size = tree::char_to_u<>(tmp[0]) * 9 + 1;
     if (dict_size == 1)
         dict_size += MAX_DICT_SIZE;
-    char *buffer = new char[dict_size];
-    src_file.read(buffer, dict_size);
+    std::vector<char> buffer(dict_size);
+    src_file.read(buffer.data(), dict_size);
     if (src_file.gcount() == 1 && dict_size == MAX_DICT_SIZE + 1)
         dict_size = 1;
-    if (dict_size > 1 && !src_file) {
-        delete[] tmp;
-        delete[] buffer;
+    if (dict_size > 1 && !src_file)
         throw std::runtime_error("decoded file is invalid");
-    }
-    h_tree->build_by_freq_dict(buffer, dict_size);
-    delete[] tmp;
-    delete[] buffer;
+    h_tree->build_by_freq_dict(buffer.data(), dict_size);
 }

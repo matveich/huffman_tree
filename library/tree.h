@@ -31,7 +31,8 @@ public:
 
     std::unique_ptr<bit_sequence> compress(const char *data, size_t data_size, bit_sequence &offset);
 
-    std::unique_ptr<bit_sequence> decompress(const char *data, size_t data_size, bit_sequence &offset, bool is_last_chunk);
+    std::unique_ptr<bit_sequence> decompress(const char *data,
+                                             size_t data_size, bit_sequence &offset, bool is_last_chunk);
 
     ~tree();
 
@@ -66,11 +67,15 @@ private:
                 left(l),
                 right(r),
                 value(val),
-                key(key) {}
+                key(key)
+        {}
 
         vertex(ull val, int key = -1) :
                 value(val),
-                key(key) {}
+                key(key)
+        {}
+
+        ~vertex() = default;
     };
 
     std::shared_ptr<vertex> head;
@@ -83,11 +88,9 @@ private:
 
     char calc_data_size();
 
-    char *ull_to_char(ull x);
+    std::vector<char> ull_to_char(ull x);
 
     void insert_ull(std::vector<char> &v, ull x);
-
-    bit_sequence uint8_to_bitseq(uint8_t c, size_t length);
 };
 
 
